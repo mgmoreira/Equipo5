@@ -41,6 +41,24 @@ export function setAlumnoSala(profesor: string, fecha: string): void{
   }
 }
 
+export function setCovid(fecha:string): boolean{
+  const alumno = context.sender;
+
+  for (let i = 0; i < salas.length; i++) {
+    if (salas[i].fecha == fecha){
+      for (let j = 0; j < salas[i].alumnos.length; j++) {
+        if (salas[i].alumnos[j].sender == alumno){
+          let sala = salas[i]
+          sala.covid = true
+          salas.replace(i, sala);
+          return true
+        }
+      }
+    }
+  }
+  return false
+}
+
 export function setAlumno(sala: string): void {
   // Creating a new message and populating fields with our data
   const message = new Alumnos(sala);
