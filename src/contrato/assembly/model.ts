@@ -23,11 +23,11 @@ export const messages = new PersistentVector<Alumnos>("m");
 @nearBindgen
 export class Sala {
     public profesor: string;
-    public fecha: i64;
+    public fecha: string;
     public alumnos: Array<Alumnos>;
     public covid: boolean;
 
-    constructor(fecha: i64, profesor: string) {
+    constructor(fecha: string, profesor: string) {
         this.profesor = profesor;
         this.fecha = fecha;
         this.alumnos = [];
@@ -35,4 +35,4 @@ export class Sala {
     }
 }
 
-export const salas = new PersistentVector<Sala>("s");
+export let salas = new PersistentVector<Sala>("s");

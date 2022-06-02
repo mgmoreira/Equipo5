@@ -1,5 +1,5 @@
 import {Alumnos, messages, Sala, salas} from "./model";
-import {context, PersistentVector} from 'near-sdk-as'
+import {context, logging} from 'near-sdk-as'
 
 // --- contract code goes below
 
@@ -12,17 +12,34 @@ const MESSAGE_LIMIT = 10;
  * But right now we don't distinguish them with annotations yet.
  */
 
-export function setSala(profesor: string): void{
-  //const profesor = context.sender;
-  //const fecha = new Date();
-  let sala = new Sala(1, profesor);
+export function setSala(fecha: string): void{
+  const profesor = context.sender;
+  let sala = new Sala(fecha, profesor);
   salas.push(sala)
 }
 
-export function getSalas(): u32{
-  return salas.length
+export function getSalas(): Sala[]{
+  const numMessages = min(MESSAGE_LIMIT, salas.length);
+  const startIndex = salas.length - numMessages;
+  const result = new Array<Sala>(numMessages);
+  for (let i = 0; i < numMessages; i++) {
+    result[i] = salas[i + startIndex];
+  }
+  return result;
 }
 
+export function setAlumnoSala(profesor: string, fecha: string): void{
+  let alumno = new Alumnos("");
+  for (let i = 0; i < salas.length; i++) {
+    if (salas[i].profesor == profesor && salas[i].fecha == fecha){
+      let sala = salas[i]
+      sala.alumnos.push(alumno)
+      salas.replace(i, sala);
+      logging.log("Se registro al alumno correctamente.");
+      break
+    }
+  }
+}
 
 export function setAlumno(sala: string): void {
   // Creating a new message and populating fields with our data
