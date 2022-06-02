@@ -1,4 +1,5 @@
-import { Alumnos, messages } from "./model";
+import {Alumnos, messages, Sala, salas} from "./model";
+import {context, PersistentVector} from 'near-sdk-as'
 
 // --- contract code goes below
 
@@ -10,6 +11,19 @@ const MESSAGE_LIMIT = 10;
  * NOTE: This is a change method. Which means it will modify the state.\
  * But right now we don't distinguish them with annotations yet.
  */
+
+export function setSala(profesor: string): void{
+  //const profesor = context.sender;
+  //const fecha = new Date();
+  let sala = new Sala(1, profesor);
+  salas.push(sala)
+}
+
+export function getSalas(): u32{
+  return salas.length
+}
+
+
 export function setAlumno(sala: string): void {
   // Creating a new message and populating fields with our data
   const message = new Alumnos(sala);

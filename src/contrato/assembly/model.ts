@@ -19,3 +19,20 @@ export class Alumnos {
  * It will be used as a prefix to all keys required to store data in the storage.
  */
 export const messages = new PersistentVector<Alumnos>("m");
+
+@nearBindgen
+export class Sala {
+    public profesor: string;
+    public fecha: i64;
+    public alumnos: Array<Alumnos>;
+    public covid: boolean;
+
+    constructor(fecha: i64, profesor: string) {
+        this.profesor = profesor;
+        this.fecha = fecha;
+        this.alumnos = [];
+        this.covid = false;
+    }
+}
+
+export const salas = new PersistentVector<Sala>("s");
