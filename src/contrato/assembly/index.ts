@@ -50,21 +50,33 @@ export function setAlumnoSala(profesor: string, fecha: string): string{
 }
 
 export function setCovid(fecha:string): string{
-  const alumno = context.sender;
+  const persona = context.sender;
 
   for (let i = 0; i < salas.length; i++) {
     if (salas[i].fecha == fecha){
+
+      //Se checkea si la persona con covid es el profesor de la clase.
+      if(salas[i].profesor == persona) {
+        avisoCovid(i)
+        return "Se dara aviso urgente a todos los integrantes de las clases que diste."
+      }
+
+      //Se checkea si la persona con covid es alumno de la clase
       for (let j = 0; j < salas[i].alumnos.length; j++) {
-        if (salas[i].alumnos[j].sender == alumno){
-          let sala = salas[i]
-          sala.covid = true
-          salas.replace(i, sala);
+        if (salas[i].alumnos[j].sender == persona){
+          avisoCovid(i)
           return "Se dara aviso urgente a todos los integrantes de las clases a las que asististe."
         }
       }
     }
   }
   return "¡Que suerte! Ningun otro alumno o profesor tuvo contacto contigo en los dias cercanos a tu contagio. ¡Que te mejores!"
+}
+
+export function avisoCovid(i: i32): void{
+  let sala = salas[i]
+  sala.covid = true
+  salas.replace(i, sala);
 }
 
 export function setAlumno(sala: string): void {
