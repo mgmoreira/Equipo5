@@ -12,10 +12,18 @@ const MESSAGE_LIMIT = 10;
  * But right now we don't distinguish them with annotations yet.
  */
 
-export function setSala(fecha: string): void{
+export function setSala(fecha: string): string{
   const profesor = context.sender;
   let sala = new Sala(fecha, profesor);
+
+  for (let i = 0; i < salas.length; i++) {
+    if (salas[i].profesor == profesor && salas[i].fecha == fecha){
+      return "El profesor ya esta asignado a una sala para el dia seleccionado."
+    }
+  }
   salas.push(sala)
+  return "¡La sala fue dada de alta correctamente!"
+
 }
 
 export function getSalas(): Sala[]{
@@ -28,20 +36,20 @@ export function getSalas(): Sala[]{
   return result;
 }
 
-export function setAlumnoSala(profesor: string, fecha: string): void{
+export function setAlumnoSala(profesor: string, fecha: string): string{
   let alumno = new Alumnos("");
   for (let i = 0; i < salas.length; i++) {
     if (salas[i].profesor == profesor && salas[i].fecha == fecha){
       let sala = salas[i]
       sala.alumnos.push(alumno)
       salas.replace(i, sala);
-      logging.log("Se registro al alumno correctamente.");
-      break
+      return "¡Se dio de alta al alumno en la clase seleccionada!"
     }
   }
+  return "El profesor no dio clases en el dia seleccionado."
 }
 
-export function setCovid(fecha:string): boolean{
+export function setCovid(fecha:string): string{
   const alumno = context.sender;
 
   for (let i = 0; i < salas.length; i++) {
@@ -51,12 +59,12 @@ export function setCovid(fecha:string): boolean{
           let sala = salas[i]
           sala.covid = true
           salas.replace(i, sala);
-          return true
+          return "Se dara aviso urgente a todos los integrantes de las clases a las que asististe."
         }
       }
     }
   }
-  return false
+  return "¡Que suerte! Ningun otro alumno o profesor tuvo contacto contigo en los dias cercanos a tu contagio. ¡Que te mejores!"
 }
 
 export function setAlumno(sala: string): void {
