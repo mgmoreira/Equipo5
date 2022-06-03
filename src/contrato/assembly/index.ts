@@ -13,12 +13,13 @@ const MESSAGE_LIMIT = 10;
  */
 
 export function setSala(fecha: string): string{
+  assert(validarFecha(fecha), "El campo fecha se ingreso incorrectamente. Por favor respete el formato aaaa-MM-dd");
   const profesor = context.sender;
   let sala = new Sala(fecha, profesor);
 
   for (let i = 0; i < salas.length; i++) {
     if (salas[i].profesor == profesor && salas[i].fecha == fecha){
-      return "El profesor ya esta asignado a una sala para el dia seleccionado."
+      assert(false,"El profesor ya esta asignado a una sala para el dia seleccionado.")
     }
   }
   salas.push(sala)
@@ -37,19 +38,46 @@ export function getSalas(): Sala[]{
 }
 
 export function setAlumnoSala(profesor: string, fecha: string): string{
-  let alumno = new Alumnos("");
+  assert(validarFecha(fecha), "El campo fecha se ingreso incorrectamente. Por favor respete el formato aaaa-MM-dd");
+  let persona = context.sender;
+  let alumno = new Alumnos();
   for (let i = 0; i < salas.length; i++) {
     if (salas[i].profesor == profesor && salas[i].fecha == fecha){
+      for (let j = 0; j < salas[i].alumnos.length; j++) {
+        if (salas[i].alumnos[j].sender == persona){
+          assert(false,"El alumno ya fue dado de alta para la clase seleccionada")
+        }
+      }
       let sala = salas[i]
       sala.alumnos.push(alumno)
       salas.replace(i, sala);
       return "¡Se dio de alta al alumno en la clase seleccionada!"
     }
   }
-  return "El profesor no dio clases en el dia seleccionado."
+  assert(false,"El profesor no dio clases en el dia seleccionado.")
+  return ""
+}
+
+function validarFecha(fecha: string): boolean {
+  let fechaSplit = fecha.split("-")
+  if(fechaSplit.length != 3){
+    return false;
+  }
+  if(parseInt(fechaSplit[0]) < 2021){
+    return false;
+  }
+  if(parseInt(fechaSplit[1]) < 1 || parseInt(fechaSplit[1]) > 12){
+    return false;
+  }
+  if(parseInt(fechaSplit[2]) < 1 || parseInt(fechaSplit[1]) > 31){
+    return false;
+  }
+  return true;
 }
 
 export function setCovid(fecha:string): string{
+  assert(validarFecha(fecha), "El campo fecha se ingreso incorrectamente. Por favor respete el formato aaaa-MM-dd");
+
   const persona = context.sender;
 
   for (let i = 0; i < salas.length; i++) {
@@ -81,9 +109,9 @@ export function avisoCovid(i: i32): void{
 
 export function setAlumno(sala: string): void {
   // Creating a new message and populating fields with our data
-  const message = new Alumnos(sala);
+  //const message = new Alumnos(sala);
   // Adding the message to end of the the persistent collection
-  messages.push(message);
+  //messages.push(message);
 }
 
 /**

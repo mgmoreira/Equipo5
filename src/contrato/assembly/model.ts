@@ -5,10 +5,8 @@ import { context, u128, PersistentVector } from "near-sdk-as";
  */
 @nearBindgen
 export class Alumnos {
-    premium: boolean;
     sender: string;
-    constructor(public text: string) {
-        this.premium = context.attachedDeposit >= u128.from('10000000000000000000000');
+    constructor() {
         this.sender = context.sender;
     }
 }
