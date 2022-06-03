@@ -34,3 +34,16 @@ export class Sala {
 }
 
 export let salas = new PersistentVector<Sala>("s");
+
+@nearBindgen
+export class Covid {
+    public persona: string;
+    public donacion: boolean;
+
+    constructor(persona: string) {
+        this.persona = persona;
+        this.donacion = false;
+    }
+}
+
+export let covid = new PersistentVector<Covid>("c");

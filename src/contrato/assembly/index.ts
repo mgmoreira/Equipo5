@@ -1,5 +1,5 @@
-import {Alumnos, messages, Sala, salas} from "./model";
-import {context, logging} from 'near-sdk-as'
+import {Alumnos, Covid, covid, messages, Sala, salas} from "./model";
+import {context, logging, u128, ContractPromiseBatch } from 'near-sdk-as'
 
 // The maximum number of latest messages the contract returns.
 const MESSAGE_LIMIT = 10;
@@ -105,14 +105,14 @@ export function setCovid(fecha:string): string{
     if (fechas.has(salas[i].fecha)){
       //Se checkea si la persona con covid es el profesor de la clase.
       if(salas[i].profesor == persona) {
-        avisoCovid(i)
+        avisoCovid(i, persona)
         avisoEnviado = true;
       }
 
       //Se checkea si la persona con covid es alumno de la clase
       for (let j = 0; j < salas[i].alumnos.length; j++) {
         if (salas[i].alumnos[j].sender == persona){
-          avisoCovid(i)
+          avisoCovid(i, persona)
           avisoEnviado = true;
         }
       }
@@ -164,13 +164,54 @@ function mesLargo(mes:f64): boolean{
   return false;
 }
 
-export function avisoCovid(i: i32): void{
+export function avisoCovid(i: i32, persona:string): void{
   let sala = salas[i]
   sala.covid = true
   salas.replace(i, sala);
+  var repite = false; 
+  for (let i = 0; i < covid.length; i++) {
+    if (covid[i].persona == persona) {
+      repite = true;
+    }
+  }
+  if(!repite) {
+    covid.push(new Covid(persona))
+  }
+
+}
+
+/**
+ * Método de ESCRITURA para dar envio de ayuda por donacion a las personas que tienen o tuvieron covid
+ *  >> near call dev-1654198617102-40626897569944 setAyuda '' --accountId mmoreira.testnet
+ *
+ * @returns string: Responde con un mensaje en caso exitoso.
+ */
+export function setAyuda(): string{
+  assert(context.sender == "mmoreira.testnet", "No tienes permisos para enviar donaciones");
+  for (let i = 0; i < covid.length; i++) {
+    if(!covid[i].donacion) {
+      var covidDonacion = covid[i];
+      ContractPromiseBatch.create(covidDonacion.persona).transfer(u128.from('1000000000000000000000000'));
+      covidDonacion.donacion = true;
+      covid.replace(i, covidDonacion)
+    }
+  }
+  return "¡La ayuda esta en camino!";
 }
 
 
-//export function setAyuda(): void{
-
-//}
+/**
+ * Método de Lectura que retorna un listado de todas las salas con sus alumnos y fechas.
+ *  >> near view dev-1654198617102-40626897569944 getSalas
+ *
+ * @returns salas
+ */
+export function getCovid(): Covid[]{
+  const numMessages = min(MESSAGE_LIMIT, covid.length);
+  const startIndex = covid.length - numMessages;
+  const result = new Array<Covid>(numMessages);
+  for (let i = 0; i < numMessages; i++) {
+    result[i] = covid[i + startIndex];
+  }
+  return result;
+}
