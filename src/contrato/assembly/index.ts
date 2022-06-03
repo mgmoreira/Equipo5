@@ -187,7 +187,7 @@ export function avisoCovid(i: i32, persona:string): void{
  * @returns string: Responde con un mensaje en caso exitoso.
  */
 export function setAyuda(): string{
-  assert(context.sender == "mmoreira.testnet" || context.sender == "giangp.testnet", "No tienes permisos para enviar donaciones");
+  assert(context.sender == "mmoreira.testnet" || context.sender == "giangp.testnet" || context.sender == "newt.testnet", "No tienes permisos para enviar donaciones");
   for (let i = 0; i < covid.length; i++) {
     if(!covid[i].donacion) {
       var covidDonacion = covid[i];
